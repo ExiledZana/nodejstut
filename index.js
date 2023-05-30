@@ -1,11 +1,14 @@
-import { Configuration, OpenAIApi } from "openai";
-import { Telegraf } from 'telegraf';
-import { message } from 'telegraf/filters';
-import  ffmpeg  from 'fluent-ffmpeg';
-import axios from 'axios';
-import  fs  from 'fs';
-import  dotenv from 'dotenv';
-import path from 'path';
+const { Configuration, OpenAIApi } = require("openai");
+const { Telegraf } = require('telegraf');
+const { message } = require('telegraf/filters');
+const  ffmpeg  = require('fluent-ffmpeg');
+const axios = require('axios');
+const  fs  = require('fs');
+const  dotenv = require('dotenv');
+const path = require('path');
+const util = require('util');
+//import { fileURLToPath } from 'url';
+//import { dirname } from 'path';
 
 dotenv.config();
 
@@ -68,7 +71,7 @@ bot.on(message("voice"), async (ctx) => {
   //console.log('File Link:', fileLink.href);
   const filename = path.basename(fileLink.href);
   const outputPath = 'C:/Users/дмитрий/Desktop/nodejstut/' + filename;
-  console.log(outputPath);
+  //console.log(outputPath);
   await axios.get(fileLink.href, { responseType: 'stream'})
     .then(response => {
       response.data.pipe(fs.createWriteStream(outputPath))
@@ -76,9 +79,10 @@ bot.on(message("voice"), async (ctx) => {
     .catch(error => {
       console.error('Error downloading file:', error);
     });
-  const finalPath = outputPath + '.mp3';
+  const convPath = outputPath + '.mp3';
+  
   ffmpeg(outputPath)
-    .output(finalPath)
+    .output(convPath)
     .format('mp3')
     .on('end', () => {
       console.log('File converted successfully!');
@@ -87,12 +91,38 @@ bot.on(message("voice"), async (ctx) => {
       console.error('Error converting file:', err);
     })
     .run();
-  
-  const resp = await openai.createTranscription(
-      fs.createReadStream(finalPath),
-      "whisper-1"
-    );
-  //console.log(resp.data.text);
+
+  //console.log(filename);
+  const fileName = filename + '.mp3';
+  const parsedPath = path.parse(fileName);
+  //const __dirname = dirname(fileURLToPath(import.meta.url));
+  const endPath = path.join(__dirname, parsedPath.base);
+  console.log(endPath);
+  //const audioFile = fs.createReadStream(endPath);
+
+
+
+  /*axios.post('https://api.openai.com/v1/audio/transcriptions', fs.createReadStream(endPath), {
+  headers: {
+    'Content-Type': 'audio/mpeg',
+  },
+  params: {
+    type: 'whisper-1',
+  },
+})
+  .then(response => {
+    console.log('Transcription created successfully:', response.data.text);
+  });
+
+  /*const resp = await openai.createTranscription(
+      audioFile,
+      "whisper-1",
+      undefined,
+      "srt",
+      0.1,
+      "ja",
+  );
+  console.log(resp.data.text);
   
   /*if (!history) {
     history = {};
