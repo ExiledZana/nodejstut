@@ -7,15 +7,19 @@ const  fs  = require('fs');
 const  dotenv = require('dotenv');
 const path = require('path');
 const util = require('util');
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg')
 //import { fileURLToPath } from 'url';
 //import { dirname } from 'path';
 
 dotenv.config();
 
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+/*
 const ffmpegPath = 'C:/Users/дмитрий/Desktop/nodejstut/ffmpeg/bin/ffmpeg.exe';
 const ffprobePath = 'C:/Users/дмитрий/Desktop/nodejstut/ffmpeg/bin/ffprobe.exe';
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
+*/
 const configuration = new Configuration({
   apiKey: process.env.OPENAIAPIKEY,
 });
